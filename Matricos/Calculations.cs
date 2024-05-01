@@ -24,13 +24,17 @@ namespace Matricos
         public int[,] Multi()
         {
             int[,] result = new int[_size, _size];
-            Task[] tasks = new Task[_size];
+            Thread[] threads = new Thread[_size];
             for (int i = 0; i < _size; i++)
             {
                 int rows = i;
-                tasks[i] = Task.Run(() => MultiplyRow(rows, result));
+                threads[i] = new Thread(() => MultiplyRow(rows, result));
+                threads[i].Start();
             }
-            Task.WaitAll(tasks);
+            for (int i = 0; i < _size; i++)
+            {
+                threads[i].Join();
+            }
             return result;
         }
 
@@ -45,19 +49,6 @@ namespace Matricos
                 }
                 result[row, j] = sum;
             }
-        }
-
-        public int[,] MultiMTA()
-        {
-            int[,] result = new int[_size, _size];
-            Task[] tasks = new Task[_size];
-            for (int i = 0; i < _size; i++)
-            {
-                int rows = i;
-                tasks[i] = Task.Factory.StartNew(() => MultiplyRow(rows, result), TaskCreationOptions.LongRunning);
-            }
-            Task.WaitAll(tasks);
-            return result;
         }
     }
 }
