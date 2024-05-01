@@ -1,4 +1,6 @@
+using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Security.Policy;
 using System.Windows.Forms;
 
 namespace Matricos
@@ -18,7 +20,7 @@ namespace Matricos
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+            //sukuria matricos forma su teksto langais
             int size = Convert.ToInt32(txtSize.Text);
             MatrixA.Controls.Clear();
             if (size > 5)
@@ -91,8 +93,68 @@ namespace Matricos
         private void button2_Click(object sender, EventArgs e)
         {
             Size = new Size(875, 620);
-        }
 
+            int size = Convert.ToInt32(txtSize.Text);
+            int[,] matrixA = new int[size, size];
+            int[,] matrixB = new int[size, size];
+
+            //prideda skaicius i 2D masyva
+            int k = 0;
+            foreach (Control c in MatrixA.Controls)
+            {
+                if (c is TextBox)
+                {
+                    TextBox tb = (TextBox)c;
+                    int value = int.Parse(tb.Text);
+                    matrixA[k / size, k % size] = value;
+                    k++;
+                }
+            }
+
+            k = 0;
+            foreach (Control c in MatrixB.Controls)
+            {
+                if (c is TextBox)
+                {
+                    TextBox tb = (TextBox)c;
+                    int value = int.Parse(tb.Text);
+                    matrixB[k / size, k % size] = value;
+                    k++;
+                }
+            }
+
+            Calculations multiplier = new Calculations(matrixA, matrixB, size);
+            int[,] result = multiplier.Multi();
+
+            k = 0;
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    int name = (i + 1) * 10 + j + 1;
+                    TextBox a = new TextBox();
+                    a.Size = new Size(40, 20);
+                    a.Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold);
+                    a.Name = "MatrixC_" + name.ToString();
+                    MatrixRez.Controls.Add(a);
+
+                    if (j + 1 == size)
+                    {
+                        MatrixRez.SetFlowBreak(a, true);
+                    }
+                }
+            }
+            k = 0;
+            foreach (Control c in MatrixRez.Controls)
+            {
+                if (c is TextBox)
+                {
+                    TextBox tb = (TextBox)c;
+                    tb.Text = result[k / size, k % size].ToString();
+                    k++;
+                }
+            }
+        }
         private void button3_Click(object sender, EventArgs e)
         {
             clearText(MatrixA);
