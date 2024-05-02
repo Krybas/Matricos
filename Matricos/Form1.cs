@@ -1,7 +1,4 @@
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Security.Policy;
-using System.Windows.Forms;
+using TextBox = System.Windows.Forms.TextBox;
 
 namespace Matricos
 {
@@ -15,152 +12,134 @@ namespace Matricos
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Size = new Size(266, 210);
+            Size = new Size(269, 333);
+        }
+        private void GenerateMatrices()
+        {
+            int x1, x2, y1, y2;
+            if (!int.TryParse(txtX1.Text, out x1) || !int.TryParse(txtX2.Text, out x2) ||
+                !int.TryParse(txtY1.Text, out y1) || !int.TryParse(txtY2.Text, out y2))
+            {
+                MessageBox.Show("Ne visi teksto laukai pilni.");
+                return;
+            }
+
+            if (x1 > 5 || x2 > 5 || y1 > 5 || y2 > 5)
+            {
+                MessageBox.Show("Didziausias didziausia matrica yra 5x5.");
+                return;
+            }
+
+            if (y1 != x2)
+            {
+                MessageBox.Show("y1 ir x2 turi buti vienodi.");
+                return;
+            }
+
+            Size = new Size(875, 391);
+
+            GenerateMatrix(MatrixA, "Matrica A", x1, y1);
+            GenerateMatrix(MatrixB, "Matrica B", x2, y2);
+        }
+
+        private void GenerateMatrix(FlowLayoutPanel matrixPanel, string name, int rows, int cols)
+        {
+            Label matrixLabel = new Label
+            {
+                Size = new Size(100, 30),
+                Text = name,
+                BackColor = Color.Snow,
+                ForeColor = Color.DarkSlateGray,
+                BorderStyle = BorderStyle.None,
+                Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold)
+            };
+            matrixPanel.Controls.Add(matrixLabel);
+            matrixPanel.SetFlowBreak(matrixLabel, true);
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    TextBox textBox = new TextBox
+                    {
+                        Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold),
+                        Size = new Size(40, 20),
+                        Name = $"{name}_{i}_{j}"
+                    };
+                    matrixPanel.Controls.Add(textBox);
+
+                    if (j + 1 == cols)
+                    {
+                        matrixPanel.SetFlowBreak(textBox, true);
+                    }
+                }
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //sukuria matricos forma su teksto langais
-            int size = Convert.ToInt32(txtSize.Text);
             MatrixA.Controls.Clear();
-            if (size > 5)
-            {
-                MessageBox.Show("Maksimalus matricos dydis yra 5");
-            }
-            else
-            {
-                Size = new Size(875, 391);
-                Label nameA = new Label();
-                nameA.Size = new Size(100, 30);
-                nameA.Text = "Matrica A";
-                nameA.BackColor = Color.Snow;
-                nameA.ForeColor = Color.DarkSlateGray;
-                nameA.BorderStyle = BorderStyle.None;
-                nameA.Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold);
-                MatrixA.Controls.Add(nameA);
-                MatrixA.SetFlowBreak(nameA, true);
-
-                for (int i = 0; i < size; i++)
-                {
-                    for (int j = 0; j < size; j++)
-                    {
-                        int name = (i + 1) * 10 + j + 1;
-                        TextBox a = new TextBox();
-                        a.Size = new Size(40, 20);
-                        a.Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold);
-                        a.Name = name.ToString();
-                        MatrixA.Controls.Add(a);
-
-                        if (j + 1 == size)
-                        {
-                            MatrixA.SetFlowBreak(a, true);
-                        }
-                    }
-                }
-
-                MatrixB.Controls.Clear();
-
-                Label nameB = new Label();
-                nameB.Size = new Size(100, 30);
-                nameB.Text = "Matrica B";
-                nameB.BackColor = Color.Snow;
-                nameB.ForeColor = Color.DarkSlateGray;
-                nameB.BorderStyle = BorderStyle.None;
-                nameB.Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold);
-                MatrixB.Controls.Add(nameB);
-                MatrixB.SetFlowBreak(nameB, true);
-
-                for (int i = 0; i < size; i++)
-                {
-                    for (int j = 0; j < size; j++)
-                    {
-                        int name = (i + 1) * 10 + j + 1;
-                        TextBox a = new TextBox();
-                        a.Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold);
-                        a.Size = new Size(40, 20);
-                        a.Name = name.ToString();
-                        MatrixB.Controls.Add(a);
-
-                        if (j + 1 == size)
-                        {
-                            MatrixB.SetFlowBreak(a, true);
-                        }
-                    }
-                }
-            }
+            MatrixB.Controls.Clear();
+            GenerateMatrices();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Size = new Size(875, 620);
+            Size = new Size(877, 619);
+            int x1, x2, y1, y2;
 
-            int size = Convert.ToInt32(txtSize.Text);
-            int[,] matrixA = new int[size, size];
-            int[,] matrixB = new int[size, size];
-
-            //prideda skaicius i 2D masyva
-            int k = 0;
-            foreach (Control c in MatrixA.Controls)
+            if (!int.TryParse(txtX1.Text, out x1) || !int.TryParse(txtX2.Text, out x2) ||
+                !int.TryParse(txtY1.Text, out y1) || !int.TryParse(txtY2.Text, out y2))
             {
-                if (c is TextBox)
-                {
-                    TextBox tb = (TextBox)c;
-                    int value = int.Parse(tb.Text);
-                    matrixA[k / size, k % size] = value;
-                    k++;
-                }
+                MessageBox.Show("Ne visi laukeliai uzpildyti.");
+                return;
             }
 
-            k = 0;
-            foreach (Control c in MatrixB.Controls)
+            int[,] aMatrix = GetMatrixValues(MatrixA, x1, y1);
+            int[,] bMatrix = GetMatrixValues(MatrixB, x2, y2);
+
+            try
             {
-                if (c is TextBox)
-                {
-                    TextBox tb = (TextBox)c;
-                    int value = int.Parse(tb.Text);
-                    matrixB[k / size, k % size] = value;
-                    k++;
-                }
+                Calculations calc = new Calculations(aMatrix, bMatrix);
+                int[,] result = calc.Multiply();
+
+                DisplayResultMatrix(result);
             }
-
-            Calculations multiplier = new Calculations(matrixA, matrixB, size);
-            int[,] result = multiplier.Multi();
-
-            k = 0;
-            for (int i = 0; i < size; i++)
+            catch (InvalidOperationException ex)
             {
-                for (int j = 0; j < size; j++)
-                {
-                    int name = (i + 1) * 10 + j + 1;
-                    TextBox a = new TextBox();
-                    a.Size = new Size(40, 20);
-                    a.Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold);
-                    a.Name = "MatrixC_" + name.ToString();
-                    MatrixRez.Controls.Add(a);
-
-                    if (j + 1 == size)
-                    {
-                        MatrixRez.SetFlowBreak(a, true);
-                    }
-                }
-            }
-            k = 0;
-            foreach (Control c in MatrixRez.Controls)
-            {
-                if (c is TextBox)
-                {
-                    TextBox tb = (TextBox)c;
-                    tb.Text = result[k / size, k % size].ToString();
-                    k++;
-                }
+                MessageBox.Show(ex.Message);
             }
         }
+        private int[,] GetMatrixValues(FlowLayoutPanel matrixPanel, int rows, int cols)
+        {
+            int[,] matrix = new int[rows, cols];
+            int index = 0;
+
+            foreach (Control control in matrixPanel.Controls)
+            {
+                if (control is TextBox textBox)
+                {
+                    int value;
+                    if (int.TryParse(textBox.Text, out value))
+                    {
+                        matrix[index / cols, index % cols] = value;
+                    }
+                    index++;
+                }
+            }
+
+            return matrix;
+        }
+
         private void button3_Click(object sender, EventArgs e)
         {
             clearText(MatrixA);
             clearText(MatrixB);
-            txtSize.Text = "";
-
+            clearText(MatrixRez);
+            txtX1.Text = "";
+            txtX2.Text = "";
+            txtY1.Text = "";
+            txtY2.Text = "";
         }
         private void clearText(Panel PanelID)
         {
@@ -174,6 +153,50 @@ namespace Matricos
                     }
                 }
             }
+        }
+        private void DisplayResultMatrix(int[,] result)
+        {
+            MatrixRez.Controls.Clear();
+
+            for (int i = 0; i < result.GetLength(0); i++)
+            {
+                for (int j = 0; j < result.GetLength(1); j++)
+                {
+                    TextBox textBox = new TextBox
+                    {
+                        Size = new Size(40, 20),
+                        Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold),
+                        Name = $"MatrixC_{i}_{j}",
+                        Text = result[i, j].ToString(),
+                        ReadOnly = true
+                    };
+                    MatrixRez.Controls.Add(textBox);
+
+                    if (j + 1 == result.GetLength(1))
+                    {
+                        MatrixRez.SetFlowBreak(textBox, true);
+                    }
+                }
+            }
+        }
+        private void txtX1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
+        }
+
+        private void txtY1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
+        }
+
+        private void txtX2_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
+        }
+
+        private void txtY2_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
         }
     }
 }

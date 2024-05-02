@@ -1,54 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Reflection.Metadata.BlobBuilder;
+﻿using System.Diagnostics;
 
 namespace Matricos
 {
     public class Calculations
     {
-        private int[,] _MatrixA;
-        private int[,] _MatrixB;
-        private int _size;
+        private int[,] _matrixA;
+        private int[,] _matrixB;
 
-        public Calculations(int[,] MatrixA, int[,] MatrixB, int size)
+        public Calculations(int[,] MatrixA, int[,] MatrixB)
         {
-            _MatrixA = MatrixA;
-            _MatrixB = MatrixB;
-            _size = size;
+            _matrixA = MatrixA;
+            _matrixB = MatrixB;
         }
 
-        public int[,] Multi()
+        public int[,] Multiply()
         {
-            int[,] result = new int[_size, _size];
-            Thread[] threads = new Thread[_size];
-            for (int i = 0; i < _size; i++)
-            {
-                int rows = i;
-                threads[i] = new Thread(() => MultiplyRow(rows, result));
-                threads[i].Start();
-            }
-            for (int i = 0; i < _size; i++)
-            {
-                threads[i].Join();
-            }
-            return result;
-        }
+            int x1 = _matrixA.GetLength(0);
+            int y1 = _matrixA.GetLength(1);
+            int x2 = _matrixB.GetLength(0);
+            int y2 = _matrixB.GetLength(1);
 
-        private void MultiplyRow(int row, int[,] result)
-        {
-            for (int j = 0; j < _size; j++)
+            int[,] result = new int[x1, y2];
+
+            var Stopwatch = new Stopwatch();
+            Stopwatch.Start();
+
+            for (int i = 0; i < x1; i++)
             {
-                int sum = 0;
-                for (int k = 0; k < _size; k++)
+                for (int j = 0; j < y2; j++)
                 {
-                    sum += _MatrixA[row, k] * _MatrixB[k, j];
+                    int sum = 0;
+                    Thread[] threads = new Thread[y1];
+
+                    for (int k = 0; k < y1; k++)
+                    {
+                        int m = k;
+                        threads[k] = new Thread(() =>
+                        {
+                            int partialProduct = _matrixA[i, m] * _matrixB[m, j];
+                            lock (result)
+                            {
+                                sum += partialProduct;
+                            }
+                        });
+                        threads[k].Start();
+                    }
+
+                    foreach (var thread in threads)
+                    {
+                        thread.Join();
+                    }
+                    result[i, j] = sum;
                 }
-                result[row, j] = sum;
             }
+
+            Stopwatch.Stop();
+            TimeSpan Time = Stopwatch.Elapsed;
+            double TimeMs = Time.TotalMilliseconds;
+            MessageBox.Show($"Laikas: {TimeMs} ms");
+            Stopwatch.Reset();
+
+            return result;
         }
     }
 }
