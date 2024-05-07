@@ -74,6 +74,15 @@ namespace Matricos
                     }
                 }
             }
+
+            Random num = new Random();
+            foreach (Control c in  matrixPanel.Controls)
+            {
+                if (c is TextBox value)
+                {
+                    value.Text = num.Next(1,100).ToString();
+                }
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -164,7 +173,7 @@ namespace Matricos
                 {
                     TextBox textBox = new TextBox
                     {
-                        Size = new Size(40, 20),
+                        Size = new Size(55, 30),
                         Font = new Font("Segoe UI Semibold", 14, FontStyle.Bold),
                         Name = $"MatrixC_{i}_{j}",
                         Text = result[i, j].ToString(),
